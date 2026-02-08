@@ -3,6 +3,7 @@
     "name": "expense_tracker_mobile",
     "slug": "expense_tracker_mobile",
     "version": "1.0.0",
+    "backgroundColor": "#171717",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "expensetrackermobile",
@@ -12,8 +13,9 @@
       "supportsTablet": true
     },
     "android": {
+      "backgroundColor": "#171717",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
+        "backgroundColor": "#171717",
         "foregroundImage": "./assets/images/android-icon-foreground.png",
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
@@ -33,7 +35,7 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#ffffff",
+          "backgroundColor": "#171717",
           "dark": {
             "backgroundColor": "#000000"
           }
