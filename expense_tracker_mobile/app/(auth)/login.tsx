@@ -9,17 +9,25 @@ import Input from "@/components/Input";
 import * as Icons from "phosphor-react-native";
 import Button from "@/components/Button";
 import { useRouter } from "expo-router";
+import { useAuth } from "@/contexts/authContext";
 const Login = () => {
   const emailRef = useRef("");
   const passwordRef = useRef("");
   const [isLoading, setIsLoading] = useState(false);
 
   const router = useRouter();
+  const { login: loginUser } = useAuth();
 
   const handleSubmit = async () => {
     if (!emailRef.current || !passwordRef.current) {
       Alert.alert("Please fill all the fields");
       return;
+    }
+    setIsLoading(true);
+    const res = await loginUser(emailRef.current, passwordRef.current);
+    setIsLoading(false);
+    if (!res.success) {
+      Alert.alert("Login", res.msg);
     }
   };
 
@@ -80,7 +88,7 @@ const Login = () => {
         <View style={styles.footer}>
           <Typo size={15}>Don't have an account ?</Typo>
           <Pressable onPress={() => router.navigate("/(auth)/register")}>
-            <Typo size={15} fontWeight={700} color={colors.primary}>
+            <Typo size={14} fontWeight={700} color={colors.primary}>
               Sign Up
             </Typo>
           </Pressable>
