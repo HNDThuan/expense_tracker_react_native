@@ -11,7 +11,12 @@ const StackLayout = () => {
         animation: "slide_from_right",
         contentStyle: { backgroundColor: colors.neutral900 },
       }}
-    ></Stack>
+    >
+      <Stack.Screen
+        name="(modals)/profileModal"
+        options={{ presentation: "modal" }}
+      ></Stack.Screen>
+    </Stack>
   );
 };
 

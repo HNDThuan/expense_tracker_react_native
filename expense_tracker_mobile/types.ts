@@ -56,7 +56,7 @@ export type IconProps = {
 };
 
 export type HeaderProps = {
-  titile?: string;
+  title?: string;
   style?: ViewStyle;
   leftIcon?: ReactNode;
   rightIcon?: ReactNode;
