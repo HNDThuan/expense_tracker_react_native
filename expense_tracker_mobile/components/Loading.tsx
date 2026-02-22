@@ -8,7 +8,7 @@ import {
 import React from "react";
 import { colors } from "@/constants/theme";
 
-const loading = ({
+const Loading = ({
   size = "large",
   color = colors.primary,
 }: ActivityIndicatorProps) => {
@@ -19,6 +19,6 @@ const loading = ({
   );
 };
 
-export default loading;
+export default Loading;
 
 const styles = StyleSheet.create({});

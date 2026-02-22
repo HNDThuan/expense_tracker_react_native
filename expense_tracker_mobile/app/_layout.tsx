@@ -2,20 +2,25 @@ import { StyleSheet, Text, View } from "react-native";
 import React, { use } from "react";
 import { Stack } from "expo-router";
 import { colors } from "@/constants/theme";
-import { AuthProvider } from "@/contexts/authContext";
+import { AuthProvider, useAuth } from "@/contexts/authContext";
 const StackLayout = () => {
+  const { user } = useAuth();
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        animation: "slide_from_right",
         contentStyle: { backgroundColor: colors.neutral900 },
       }}
     >
       <Stack.Screen
         name="(modals)/profileModal"
         options={{ presentation: "modal" }}
-      ></Stack.Screen>
+      />
+
+      <Stack.Screen
+        name="(modals)/walletModal"
+        options={{ presentation: "modal" }}
+      />
     </Stack>
   );
 };

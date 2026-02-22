@@ -19,100 +19,124 @@ import { getProfileImage } from "@/services/imageService";
 import { scale, verticalScale } from "@/utils/styling";
 import * as Icon from "phosphor-react-native";
 import Input from "@/components/Input";
-import { UserDataType } from "@/types";
+import { UserDataType, WalletType } from "@/types";
 import Button from "@/components/Button";
 import { useAuth } from "@/contexts/authContext";
 import { updateUser } from "@/services/userService";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
-const ProfileModal = () => {
+import ImageUpload from "@/components/ImageUpload";
+import { createOrUpdateWallet, deleteWallet } from "@/services/walletService";
+const WalletModal = () => {
   const { user, updateUserData } = useAuth();
-  const [userData, setUserData] = useState<UserDataType>({
+  const [wallet, setWallet] = useState<WalletType>({
     name: "",
     image: null,
   });
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  const oldWallet: { name: string; image: string; id: string } =
+    useLocalSearchParams();
+
   useEffect(() => {
-    setUserData({
-      name: user?.name || "",
-      image: user?.image || null,
-    });
-  }, [user]);
-
-  const onPickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ["images"],
-      // allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.5,
-    });
-
-    console.log(result);
-
-    if (!result.canceled) {
-      setUserData({ ...userData, image: result.assets[0] });
+    if (oldWallet?.id) {
+      setWallet({
+        name: oldWallet?.name,
+        image: oldWallet?.image,
+      });
     }
-  };
+  }, []);
 
   const onSubmit = async () => {
     Keyboard.dismiss();
-    let { name, image } = userData;
-    if (!name.trim()) {
-      Alert.alert("User", "Please fill all the fields");
+    let { name, image } = wallet;
+    if (!name.trim() || !image) {
+      Alert.alert("Wallet", "Please fill all the fields");
       return;
     }
+    const data: WalletType = { name, image, uid: user?.uid };
+
+    if (oldWallet?.id) data.id = oldWallet?.id;
     setLoading(true);
-    const res = await updateUser(user?.uid as string, userData);
+
+    const res = await createOrUpdateWallet(data);
     setLoading(false);
     if (res.success) {
-      //update user
-      updateUserData(user?.uid as string);
       router.back();
     } else {
-      Alert.alert("User", res.msg);
+      Alert.alert("Wallet", res.msg);
     }
+  };
+
+  const onDelete = async () => {
+    if (!oldWallet?.id) return;
+    setLoading(true);
+    const res = await deleteWallet(oldWallet?.id);
+    setLoading(false);
+    if (res.success) {
+      router.back();
+    } else {
+      Alert.alert("Wallet", res.msg);
+    }
+  };
+
+  const showDeleteAlert = () => {
+    Alert.alert(
+      "Confirm",
+      "Are you sure you want to delete this wallet ? \nThis action will remove all transactions related to this wallet",
+      [
+        {
+          text: "Cancel",
+          onPress: () => console.log("Cancel delete"),
+          style: "cancel",
+        },
+        { text: "Delete", onPress: () => onDelete(), style: "destructive" },
+      ],
+    );
   };
   return (
     <ModalWrapper>
       <View style={styles.container}>
         <Header
-          title="Update Profile"
+          title={oldWallet?.id ? "Update Wallet" : "New Wallet"}
           leftIcon={<BackButton />}
           style={{ marginBottom: spacingY._10 }}
         />
         <ScrollView contentContainerStyle={styles.form}>
-          <View style={styles.avatarContainer}>
-            <Image
-              style={styles.avatar}
-              source={getProfileImage(userData.image)}
-              contentFit="cover"
-              transition={100}
-            />
-            <TouchableOpacity onPress={onPickImage} style={styles.editIcon}>
-              <Icon.PencilIcon
-                size={verticalScale(20)}
-                color={colors.neutral800}
-              ></Icon.PencilIcon>
-            </TouchableOpacity>
-          </View>
           <View style={styles.inputContainer}>
-            <Typo color={colors.neutral200}>Name</Typo>
+            <Typo color={colors.neutral200}> Wallet Name</Typo>
             <Input
-              placeholder="Name"
-              value={userData.name}
-              onChangeText={(value) =>
-                setUserData({ ...userData, name: value })
-              }
+              placeholder="Salary"
+              value={wallet.name}
+              onChangeText={(value) => setWallet({ ...wallet, name: value })}
             ></Input>
+          </View>
+
+          <View style={styles.inputContainer}>
+            <Typo color={colors.neutral200}> Wallet Icon</Typo>
+            <ImageUpload
+              file={wallet.image}
+              onClear={() => setWallet({ ...wallet, image: null })}
+              onSelect={(file) => setWallet({ ...wallet, image: file })}
+              placeholder="Upload Image"
+            />
           </View>
         </ScrollView>
       </View>
       <View style={styles.footer}>
+        {oldWallet?.id && !loading && (
+          <Button style={styles.deleteWallet} onPress={showDeleteAlert}>
+            <Icon.TrashIcon
+              color="white"
+              size={verticalScale(24)}
+              weight="bold"
+            />
+          </Button>
+        )}
         <Button onPress={onSubmit} loading={loading} style={{ flex: 1 }}>
           <Typo color={colors.black} fontWeight={700}>
-            Update
+            {oldWallet?.id ? "Update Wallet" : "Add Wallet"}
           </Typo>
         </Button>
       </View>
@@ -120,7 +144,7 @@ const ProfileModal = () => {
   );
 };
 
-export default ProfileModal;
+export default WalletModal;
 
 const styles = StyleSheet.create({
   container: {
@@ -170,6 +194,9 @@ const styles = StyleSheet.create({
     paddingTop: spacingY._15,
     borderTopColor: colors.neutral700,
     marginBottom: spacingY._5,
-    borderWidth: 1,
+  },
+  deleteWallet: {
+    backgroundColor: colors.rose,
+    paddingHorizontal: spacingX._15,
   },
 });

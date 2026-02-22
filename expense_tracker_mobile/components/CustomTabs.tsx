@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from "react-native";
 import { BottomTabBarProps } from "@react-navigation/bottom-tabs";
 import { colors } from "@/constants/theme";
 import {
@@ -7,10 +7,19 @@ import {
   WalletIcon,
   UserIcon,
 } from "phosphor-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const CustomTabs = ({ state, descriptors, navigation }: BottomTabBarProps) => {
+  const inset = useSafeAreaInsets();
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        {
+          paddingBottom: Math.max(inset.bottom, 10),
+        },
+      ]}
+    >
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label = options.tabBarLabel ?? options.title ?? route.name;
@@ -68,13 +77,11 @@ export default CustomTabs;
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
-    height: 70,
     backgroundColor: colors.neutral800,
-
-    paddingBottom: 10,
   },
   tab: {
     flex: 1,
+    height: 55,
     justifyContent: "center",
     alignItems: "center",
     gap: 4,

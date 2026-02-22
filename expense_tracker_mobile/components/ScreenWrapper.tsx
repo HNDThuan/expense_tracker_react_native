@@ -9,6 +9,7 @@ import {
 import React from "react";
 import { ScreenWrapperProps } from "@/types";
 import { colors } from "@/constants/theme";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const { height } = Dimensions.get("window");
 const ScreenWrapper = ({ style, children }: ScreenWrapperProps) => {
@@ -16,8 +17,12 @@ const ScreenWrapper = ({ style, children }: ScreenWrapperProps) => {
   return (
     <View
       style={[
+        {
+          paddingTop: paddingTop,
+          flex: 1,
+          backgroundColor: colors.neutral900,
+        },
         style,
-        { paddingTop: paddingTop, flex: 1, backgroundColor: colors.neutral900 },
       ]}
     >
       <StatusBar barStyle="light-content" />

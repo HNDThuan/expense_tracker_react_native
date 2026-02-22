@@ -160,7 +160,7 @@ export type ResponseType = {
   msg?: string;
 };
 
-export type Wallettype = {
+export type WalletType = {
   id?: string;
   name: string;
   amount?: number;
