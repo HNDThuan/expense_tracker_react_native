@@ -12,7 +12,7 @@ const StackLayout = () => {
         contentStyle: { backgroundColor: colors.neutral900 },
       }}
     >
-      <Stack.Screen
+      {/* <Stack.Screen
         name="(modals)/profileModal"
         options={{ presentation: "modal" }}
       />
@@ -21,6 +21,10 @@ const StackLayout = () => {
         name="(modals)/walletModal"
         options={{ presentation: "modal" }}
       />
+      <Stack.Screen
+        name="(modals)/transactionModal"
+        options={{ presentation: "modal" }}
+      /> */}
     </Stack>
   );
 };

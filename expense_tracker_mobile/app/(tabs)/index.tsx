@@ -1,4 +1,10 @@
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React from "react";
 import Button from "@/components/Button";
 import Typo from "@/components/Typo";
@@ -8,30 +14,55 @@ import { auth } from "@/config/firebase";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import { verticalScale } from "@/utils/styling";
 import { useAuth } from "@/contexts/authContext";
-import * as Icon from "phosphor-react-native"
+import * as Icon from "phosphor-react-native";
 import HomeCard from "@/components/HomeCard";
 import TransactionList from "@/components/TransactionList";
+import { useRouter } from "expo-router";
 
 const Home = () => {
-  const { user } = useAuth()
+  const { user } = useAuth();
+  const router = useRouter();
+
   return (
     <ScreenWrapper>
       <View style={styles.container}>
         <View style={styles.header}>
-          <View style={{ gap: 4 }}>
-            <Typo size={16} color={colors.neutral300}>Hello,</Typo>
-            <Typo size={18} color={colors.primary} fontWeight={500}>{user?.name}</Typo>
+          <View style={{ gap: 4, paddingTop: 10 }}>
+            <Typo size={16} color={colors.neutral300}>
+              Hello,{" "}
+              <Typo size={18} color={colors.primary} fontWeight={500}>
+                {user?.name}
+              </Typo>
+            </Typo>
           </View>
           <TouchableOpacity style={styles.searchIcon}>
-            <Icon.MagnifyingGlassIcon size={verticalScale(22)} color={colors.neutral200} weight="bold" />
+            <Icon.MagnifyingGlassIcon
+              size={verticalScale(22)}
+              color={colors.neutral200}
+              weight="bold"
+            />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={styles.scrollContainer} showsVerticalScrollIndicator={false}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          showsVerticalScrollIndicator={false}
+        >
           <View>
             <HomeCard />
           </View>
-          <TransactionList />
+          <TransactionList
+            data={[1, 2, 3]}
+            loading={false}
+            emptyListMessage="no transaction to show"
+            title="Recent Transactions"
+          />
         </ScrollView>
+        <Button
+          style={styles.floatingButton}
+          onPress={() => router.push("/(modals)/transactionModal")}
+        >
+          <Icon.PlusIcon color="black" weight="bold" size={verticalScale(24)} />
+        </Button>
       </View>
     </ScreenWrapper>
   );
@@ -49,13 +80,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
+    marginBottom: 5,
   },
   searchIcon: {
     padding: spacingX._10,
     backgroundColor: colors.neutral800,
-    borderRadius: 50
+    borderRadius: 50,
   },
   scrollContainer: {
     gap: spacingY._20,
-  }
+  },
+  floatingButton: {
+    height: verticalScale(50),
+    width: verticalScale(50),
+    borderRadius: 100,
+    position: "absolute",
+    bottom: verticalScale(30),
+    right: verticalScale(30),
+  },
+  scrollViewStyle: {
+    marginTop: spacingY._10,
+    paddingBottom: verticalScale(100),
+    gap: spacingY._25,
+  },
 });

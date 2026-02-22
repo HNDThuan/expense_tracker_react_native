@@ -7,7 +7,7 @@ import Typo from './Typo'
 import * as Icon from 'phosphor-react-native'
 const HomeCard = () => {
     return (
-        <ImageBackground source={require('../assets/images/card.png')} resizeMode='stretch' style={styles.bgImage} >
+        <ImageBackground source={require('../assets/images/card.png')} contentFit='fill' style={styles.bgImage} >
             <View style={styles.container}>
                 <View>
                     <View style={styles.totalBlanceRow}>

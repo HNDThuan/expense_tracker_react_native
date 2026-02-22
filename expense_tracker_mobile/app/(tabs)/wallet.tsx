@@ -22,6 +22,7 @@ import WalletListItem from "@/components/WalletListItem";
 const Wallet = () => {
   const router = useRouter();
   const { user } = useAuth();
+
   const {
     data: wallets,
     loading,
