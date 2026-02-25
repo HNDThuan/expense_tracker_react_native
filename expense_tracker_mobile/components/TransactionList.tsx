@@ -6,7 +6,11 @@ import {
   View,
 } from "react-native";
 import React from "react";
-import { TransactionItemProps, TransactionListType } from "@/types";
+import {
+  TransactionItemProps,
+  TransactionListType,
+  TransactionType,
+} from "@/types";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
 import Typo from "./Typo";
 import { FlashList } from "@shopify/flash-list";
@@ -23,7 +27,22 @@ const TransactionList = ({
   emptyListMessage,
 }: TransactionListType) => {
   const router = useRouter();
-  const handleClick = () => { };
+  const handleClick = (item: TransactionType) => {
+    router.push({
+      pathname: "/(modals)/transactionModal",
+      params: {
+        id: item?.id,
+        type: item?.type,
+        amount: item?.amount.toString(),
+        category: item?.category,
+        date: (item.date as Timestamp)?.toDate()?.toISOString(),
+        description: item?.description,
+        image: item?.image,
+        uid: item?.uid,
+        walletId: item?.walletId,
+      },
+    });
+  };
   return (
     <View style={styles.container}>
       {title && (
@@ -66,7 +85,7 @@ const TransactionItem = ({
   index,
   handleClick,
 }: TransactionItemProps) => {
-  console.log("item:", item);
+
   let category =
     item?.type == "income" ? incomeCategory : expenseCategories[item.category!];
   const IconComponent = category.icon;
@@ -76,7 +95,7 @@ const TransactionItem = ({
       day: "numeric",
       month: "short",
     });
-  console.log("category: ", category);
+
   return (
     <View>
       <TouchableOpacity style={styles.row} onPress={() => handleClick(item)}>

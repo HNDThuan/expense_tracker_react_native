@@ -30,7 +30,7 @@ const ImageUpload = ({
       quality: 0.5,
     });
 
-    console.log(result);
+
 
     if (!result.canceled) {
       onSelect(result.assets[0]);
