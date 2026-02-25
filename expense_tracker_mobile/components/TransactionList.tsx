@@ -94,6 +94,7 @@ const TransactionItem = ({
     ?.toLocaleDateString("en-GB", {
       day: "numeric",
       month: "short",
+      year: "numeric"
     });
 
   return (

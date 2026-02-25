@@ -1,8 +1,11 @@
 import { firestore } from "@/config/firebase";
 import { ResponseType, TransactionType, WalletType } from "@/types";
-import { collection, deleteDoc, doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, orderBy, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore";
 import { uploadFileToCloudinary } from "./imageService";
 import { createOrUpdateWallet } from "./walletService";
+import { getLast12Months, getLast7Days, getYearsRange } from "@/utils/common";
+import { colors } from "@/constants/theme";
+import { scale } from "@/utils/styling";
 
 export const createOrUpdateTransaction = async (
   transactionData: Partial<TransactionType>,
@@ -245,5 +248,151 @@ export const deleteTransaction = async (transactionId: string, walletId: string)
   catch (err: any) {
     console.log("error updating wallet for new transaction: ", err);
     return { success: false, msg: err.message };
+  }
+}
+
+
+export const fetchWeeklyStats = async (uid: string): Promise<ResponseType> => {
+  try {
+    const db = firestore;
+    const today = new Date()
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(today.getDate() - 7)
+
+    const transactionsQuery = query(
+      collection(db, 'transactions'),
+      where('date', '>=', Timestamp.fromDate(sevenDaysAgo)),
+      where('date', '<=', Timestamp.fromDate(today)),
+      orderBy("date", "desc"),
+      where("uid", "==", uid)
+    )
+    const querySnapshot = await getDocs(transactionsQuery)
+    const weeklyData = getLast7Days()
+    const transactions: TransactionType[] = []
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data() as TransactionType
+      transaction.id = doc.id
+      transactions.push(transaction)
+
+      const transactionDate = (transaction.date as Timestamp).toDate().toISOString().split("T")[0];
+      const dayData = weeklyData.find((day) => day.date == transactionDate);
+
+      if (dayData) {
+        if (transaction.type == 'income') {
+          dayData.income += transaction.amount
+        } else if (transaction.type == 'expense') {
+          dayData.expense += transaction.amount
+        }
+      }
+    })
+
+    const stats = weeklyData.flatMap((day) => [
+      { value: day.income, label: day.day, spacing: scale(4), labelWidth: scale(30), frontColor: colors.primary },
+      { value: day.expense, frontColor: colors.rose },
+
+    ])
+    return { success: true, data: { stats, transactions } }
+  } catch (err: any) {
+    return { success: false, msg: err.message }
+  }
+}
+
+
+export const fetchMonthlyStats = async (uid: string): Promise<ResponseType> => {
+  try {
+    const db = firestore;
+    const today = new Date()
+    const twelveMonthsAgo = new Date(today);
+    twelveMonthsAgo.setMonth(today.getMonth() - 12)
+
+    const transactionsQuery = query(
+      collection(db, 'transactions'),
+      where('date', '>=', Timestamp.fromDate(twelveMonthsAgo)),
+      where('date', '<=', Timestamp.fromDate(today)),
+      orderBy("date", "desc"),
+      where("uid", "==", uid)
+    )
+    const querySnapshot = await getDocs(transactionsQuery)
+    const monthlyData = getLast12Months()
+    const transactions: TransactionType[] = []
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data() as TransactionType
+      transaction.id = doc.id
+      transactions.push(transaction)
+
+      const transactionDate = (transaction.date as Timestamp).toDate();
+      const monthName = transactionDate.toLocaleString("default", { month: 'short' })
+      const shortYear = transactionDate.getFullYear().toString().slice(-2)
+      const monthData = monthlyData.find(
+        (month) => month.month === `${monthName} ${shortYear}`
+      );
+      if (monthData) {
+        if (transaction.type === 'income') {
+          monthData.income += transaction.amount
+        } else if (transaction.type === 'expense') {
+          monthData.expense += transaction.amount
+        }
+      }
+    })
+
+    const stats = monthlyData.flatMap((month) => [
+      { value: month.income, label: month.month, spacing: scale(4), labelWidth: scale(30), frontColor: colors.primary },
+      { value: month.expense, frontColor: colors.rose },
+
+    ])
+    return { success: true, data: { stats, transactions } }
+  } catch (err: any) {
+    return { success: false, msg: err.message }
+  }
+}
+
+
+export const fetchYearlyStats = async (uid: string): Promise<ResponseType> => {
+  try {
+    const db = firestore;
+    const today = new Date()
+    const startYear = today.getFullYear() - 4
+    const endYear = today.getFullYear()
+    const startDate = new Date(startYear, 0, 1) // Jan 1 of startYear
+
+    const transactionsQuery = query(
+      collection(db, 'transactions'),
+      where('date', '>=', Timestamp.fromDate(startDate)),
+      where('date', '<=', Timestamp.fromDate(today)),
+      orderBy("date", "desc"),
+      where("uid", "==", uid)
+    )
+    const querySnapshot = await getDocs(transactionsQuery)
+    const yearlyData = getYearsRange(startYear, endYear)
+    const transactions: TransactionType[] = []
+
+    querySnapshot.forEach((doc) => {
+      const transaction = doc.data() as TransactionType
+      transaction.id = doc.id
+      transactions.push(transaction)
+
+      const transactionDate = (transaction.date as Timestamp).toDate();
+      const year = transactionDate.getFullYear().toString()
+      const yearData = yearlyData.find(
+        (item: any) => item.year === year
+      );
+      if (yearData) {
+        if (transaction.type === 'income') {
+          yearData.income += transaction.amount
+        } else if (transaction.type === 'expense') {
+          yearData.expense += transaction.amount
+        }
+      }
+    })
+
+    const stats = yearlyData.flatMap((year: any) => [
+      { value: year.income, label: year.year, spacing: scale(4), labelWidth: scale(35), frontColor: colors.primary },
+      { value: year.expense, frontColor: colors.rose },
+    ])
+    return { success: true, data: { stats, transactions } }
+  } catch (err: any) {
+    return { success: false, msg: err.message }
   }
 }
