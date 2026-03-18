@@ -1,19 +1,19 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import React from "react";
+import Header from "@/components/Header";
 import ScreenWrapper from "@/components/ScreenWrapper";
 import Typo from "@/components/Typo";
+import { auth } from "@/config/firebase";
 import { colors, radius, spacingX, spacingY } from "@/constants/theme";
-import Header from "@/components/Header";
-import { verticalScale } from "@/utils/styling";
 import { useAuth } from "@/contexts/authContext";
-import { Image } from "expo-image";
 import { getProfileImage } from "@/services/imageService";
 import { accountOptionsType } from "@/types";
-import * as Icons from "phosphor-react-native";
-import Animated, { FadeInDown, FadeInLeft } from "react-native-reanimated";
-import { auth } from "@/config/firebase";
-import { signOut } from "firebase/auth";
+import { verticalScale } from "@/utils/styling";
+import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { signOut } from "firebase/auth";
+import * as Icons from "phosphor-react-native";
+import React from "react";
+import { Alert, StyleSheet, TouchableOpacity, View } from "react-native";
+import Animated, { FadeInDown } from "react-native-reanimated";
 const Profile = () => {
   const { user } = useAuth();
   const router = useRouter();
@@ -27,7 +27,7 @@ const Profile = () => {
     {
       title: "Settings",
       icon: <Icons.GearSixIcon size={26} color={colors.white} weight="fill" />,
-      // routeName: "/(modals)/profileModal",
+      routeName: "/(modals)/settingsModal",
       bgColor: "#059669",
     },
     {

@@ -1,10 +1,19 @@
-import { StyleSheet, Text, View } from "react-native";
-import React, { use } from "react";
-import { Stack } from "expo-router";
 import { colors } from "@/constants/theme";
 import { AuthProvider, useAuth } from "@/contexts/authContext";
+import { setupNotificationsOnStart } from "@/services/notificationService";
+import { Stack } from "expo-router";
+import React, { useEffect } from "react";
+import { StyleSheet } from "react-native";
+
 const StackLayout = () => {
   const { user } = useAuth();
+
+  useEffect(() => {
+    if (user) {
+      setupNotificationsOnStart();
+    }
+  }, [user]);
+
   return (
     <Stack
       screenOptions={{
